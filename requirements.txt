@@ -1,0 +1,26 @@
+numpy
+pandas
+
+# LangChain 
+langchain
+langchain-community
+langchain-text-splitters
+
+# Ollama (LLM + embeddings)
+ollama
+langchain-ollama
+
+# Vector db
+faiss-cpu
+
+# Document loaders
+pypdf
+beautifulsoup4
+requests
+beautifulsoup4
+bs4 
+wikipedia
+
+#UI
+streamlit
+ipykernel
