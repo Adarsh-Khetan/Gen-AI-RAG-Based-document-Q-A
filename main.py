@@ -3,11 +3,11 @@ import os
 import tempfile
 os.environ["USER_AGENT"] = "genai-rag-app/1.0"
 
-from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader
-from langchain_ollama import OllamaEmbeddings, ChatOllama
-from langchain_community.vectorstores import FAISS
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader, YoutubeLoader # type: ignore
+from langchain_ollama import OllamaEmbeddings, ChatOllama# type: ignore
+from langchain_community.vectorstores import FAISS# type: ignore
+from langchain_text_splitters import RecursiveCharacterTextSplitter# type: ignore
+from langchain_core.prompts import ChatPromptTemplate# type: ignore
 
 
 def split_documents(docs):
@@ -78,7 +78,7 @@ st.caption("PDF or URL → FAISS → Local LLM (Ollama)")
 
 source_type = st.radio(
     "Choose data source:",
-    ["PDF", "URL"]
+    ["PDF", "URL", "YouTube"]
 )
 
 # Session state
@@ -125,6 +125,39 @@ if source_type == "URL":
             st.session_state.vector_store = embed_and_vector_store(chunks)
 
             st.success("URL content processed and indexed successfully!")
+
+
+# ------------------------
+# YOUTUBE FLOW
+# ------------------------
+if source_type == "YouTube":
+    youtube_url = st.text_input("Enter a YouTube video URL")
+
+    if youtube_url and st.button("Build Knowledge Base"):
+        with st.spinner("Processing YouTube video..."):
+            try:
+                loader = YoutubeLoader.from_youtube_url(
+                    youtube_url,
+                    add_video_info=False,
+                    language=["en", "hi"]
+                )
+                docs = loader.load()
+
+                chunks = split_documents(docs)
+                st.session_state.vector_store = embed_and_vector_store(chunks)
+
+                st.success(
+                    "YouTube transcript processed and indexed successfully!"
+                )
+
+            except Exception as e:
+                st.error(
+                    "Failed to load YouTube transcript. "
+                    "This video may not have captions, "
+                    "or YouTube blocked access."
+                )
+                st.exception(e)
+
 
 
 # ------------------------
